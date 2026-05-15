@@ -16,7 +16,7 @@ kb = 1.3806488e-23
 # Import AM1.5 solar spectrum
 # --------------------------------------------------
 
-file_path = r"C:\Users\sypot\Desktop\MoS2-PtSe2\manuscript-writing-related\efficiency formula\ASTM G173-03 Reference Spectra__neat.xls"
+file_path = r"path-to-the-ASTM-file 'XLX'"
 
 solar_raw = pd.read_excel(file_path, header=None)
 
@@ -97,7 +97,7 @@ def Emin(Evbm, Ecbm, Eher, Eoer):
 # Main function
 # --------------------------------------------------
 
-def MultijunctionCell(Eedges0, Eher, Eoer):
+def HeterostructureCell(Eedges0, Eher, Eoer):
 
     # Add band gaps
     Eedges1 = []
@@ -145,13 +145,13 @@ def MultijunctionCell(Eedges0, Eher, Eoer):
     return total_sth
 
 # --------------------------------------------------
-# Example 1
+# no overpotentials
 # --------------------------------------------------
 
 HERoverp = 0 * eV
 OERoverp = 0 * eV
 
-MultijunctionCell(
+HeterostructureCell(
     [
         [-5.85 * eV, -4.14 * eV, "PtSe2"],
         [-6.44 * eV, -4.21 * eV, "MoS2"]
@@ -161,7 +161,7 @@ MultijunctionCell(
 )
 
 # --------------------------------------------------
-# Example 2
+# with overpotentials
 # --------------------------------------------------
 
 HERoverp = 0.2 * eV
@@ -177,13 +177,13 @@ MultijunctionCell(
 )
 
 # --------------------------------------------------
-# Example 3
+# with overpotentials
 # --------------------------------------------------
 
 HERoverp = 0.2 * eV
 OERoverp = 0.6 * eV
 
-MultijunctionCell(
+HeterostructureCell(
     [
         [-6.44 * eV, -4.21 * eV, "MoS2"],
         [-6.08 * eV, -3.89 * eV, "WS2"]
@@ -193,13 +193,13 @@ MultijunctionCell(
 )
 
 # --------------------------------------------------
-# Example 4
+# without overpotential
 # --------------------------------------------------
 
 HERoverp = 0 * eV
 OERoverp = 0 * eV
 
-MultijunctionCell(
+HeterostructureCell(
     [
         [-6.44 * eV, -4.21 * eV, "MoS2"],
         [-6.08 * eV, -3.89 * eV, "WS2"]
