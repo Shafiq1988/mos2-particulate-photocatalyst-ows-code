@@ -12,9 +12,9 @@ Plots of bond statistics and structural stability (png).
 This code was developed to calculates the solar-to-hydrogen (STH) conversion efficiency of hybrid photocatalyst systems based on band-edge positions and the AM1.5 solar spectrum.
 It can be run with any standard Python version:
 python STH-efficiency.py.
-Before running the script, please ensure that:
+Before running the code, please ensure that:
 the file path to the solar spectrum is correctly specified and
-the band-edges values are updated for the desired material system
+the band-edges values are updated for the desired material system.
 The script outputs:
 Total STH efficiency
 Individual contributions from each material in the heterostructure.
