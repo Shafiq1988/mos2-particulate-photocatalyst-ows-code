@@ -11,13 +11,13 @@ Plots of bond statistics and structural stability (png).
 # 2. STH-efficiency.py
 This code was developed to calculates the solar-to-hydrogen (STH) conversion efficiency of hybrid photocatalyst systems based on band-edge positions and the AM1.5 solar spectrum.
 It can be run with any standard Python version:
-python STH-efficiency.py
+python STH-efficiency.py.
 Before running the script, please ensure that:
-The file path to the solar spectrum is correctly specified
-The band-edge values and band gaps are updated for the desired material system
+the file path to the solar spectrum is correctly specified and
+the band-edges values are updated for the desired material system
 The script outputs:
 Total STH efficiency
-Individual contributions from each material in the heterostructure
+Individual contributions from each material in the heterostructure.
 # 3. Lattice-mismatch-code-for-MoS₂-PtSe₂.py
 This code evaluates lattice compatibility between two materials by calculating lattice mismatch for different combinations for example the lattice mistmatch was 0.5% for MoS₂/MWS₂ and 0.9% for MoS₂/PtSe2.
 Note: Users must input the lattice parameters of the two materials of interest. The script then identifies the optimal heterostructure combinations with minimal lattice mismatch.
