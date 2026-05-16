@@ -23,7 +23,7 @@ This code evaluates lattice compatibility between two materials by calculating l
 Note: Users must input the lattice parameters of the two materials of interest. The code then identifies the optimal heterostructure combinations with minimal lattice mismatch.
 The output includes:
 Best matching lattice configurations
-corresponding mismatch percentages
+with corresponding mismatch percentages.
 # 4. MoS₂/WS₂_MD_cif-files
 This folder contains all the structure files (cif) of the initial and final states of MoS₂/WS₂ heterostructure at 300K and 400K temperatures.The sequence are accroding to the figures in the manuscript.
 # 5. MoS₂/PtSe₂_MD_cif-files 
