@@ -26,9 +26,8 @@ Best matching lattice configurations
 Corresponding mismatch percentages
 # 4. MoS₂/WS₂_MD_cif-files
 This folder contains all the structure files (cif) of the initial and final states of MoS₂/WS₂ heterostructure at 300K and 400K temperatures.
-# 5. MoS₂/PtSe₂_MD_cif-files. The sequence are accroding to the figures in the manuscript.
+# 5. MoS₂/PtSe₂_MD_cif-files 
 This folder contains all the structure files (cif) of the initial and final states of MoS₂/PtSe₂ heterostructure at 300K and 400K temperatures.The sequence are accroding to the figures in the manuscript.
-# 6. Heterostructures_cif-file. 
+# 6. Heterostructures_cif-file 
 This folder contains the structure files (cif) of MoS₂/WS₂ and MoS₂/PtSe₂ heterostructures.
-
 This set of tools is intended to support reproducibility and facilitate the design and analysis of 2D heterostructures for photocatalytic applications.
