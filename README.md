@@ -1,4 +1,4 @@
-# MoS2-photoanode-ows-data
+# MoS₂-photoanode-ows-data
 The repository contains the data and codes associated with the manuscript entitled:
 “Photocorrosion-Inhibited MoS₂-Based Heterostructures for Stable Photoanodes in Neutral pH Overall Water Splitting”
 All scripts are written in Python and are briefly described below.
@@ -18,8 +18,8 @@ The band-edge values and band gaps are updated for the desired material system
 The script outputs:
 Total STH efficiency
 Individual contributions from each material in the heterostructure
-# 3. lattice-mismatch-code-for-MoS2-PtSe2.py
-This code evaluates lattice compatibility between two materials by calculating lattice mismatch for different combinations for example the lattice mistmatch was 0.5% for MoS2/WS2 and 0.9% for Mos2/PtSe2.
+# 3. lattice-mismatch-code-for-MoS₂-PtSe₂.py
+This code evaluates lattice compatibility between two materials by calculating lattice mismatch for different combinations for example the lattice mistmatch was 0.5% for MoS₂/MWS₂ and 0.9% for MoS₂/PtSe2.
 Note: Users must input the lattice parameters of the two materials of interest. The script then identifies the optimal heterostructure combinations with minimal lattice mismatch.
 The output includes:
 Best matching lattice configurations
