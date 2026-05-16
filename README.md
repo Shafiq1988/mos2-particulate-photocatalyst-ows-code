@@ -7,7 +7,7 @@ This code was designed for the statistical analysis of the average nearest neigh
 The script output includes:
 Time-dependent bond length evolution (in ps)
 corresponding data files (.dat)
-Plots of bond statistics and structural stability (png)
+Plots of bond statistics and structural stability (png).
 # 2. STH-efficiency.py
 This code was developed to calculates the solar-to-hydrogen (STH) conversion efficiency of hybrid photocatalyst systems based on band-edge positions and the AM1.5 solar spectrum.
 It can be run with any standard Python version:
