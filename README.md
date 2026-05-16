@@ -1,4 +1,4 @@
-# mos2-photoanode-ows-data
+# MoS2-photoanode-ows-data
 The repository contains the data and codes associated with the manuscript entitled:
 “Photocorrosion-Inhibited MoS₂-Based Heterostructures for Stable Photoanodes in Neutral pH Overall Water Splitting”
 All scripts are written in Python and are briefly described below.
