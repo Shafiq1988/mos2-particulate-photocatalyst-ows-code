@@ -2,7 +2,7 @@
 The repository contains the data and codes associated with the manuscript entitled:
 “Photocorrosion-Inhibited MoS₂-Based Heterostructures for Stable Photoanodes in Neutral pH Overall Water Splitting”
 All scripts are written in Python and are briefly described below.
-1.** bond-type.py**
+1. bond-type.py
 This script was designed for the statistical analysis of the average nearest neighbour bond distances Mo-S, W-S, Pt-Se of the heterostructures in water as a function of time (ps). The script can be excuted by using the Atomic Simulation Environment (ASE) with command -> python bond-type.py
 The script output includes:
 Time-dependent bond length evolution (in ps)
