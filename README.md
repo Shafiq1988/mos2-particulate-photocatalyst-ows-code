@@ -15,7 +15,7 @@ python STH-efficiency.py.
 Before running the code, please ensure that:
 the file path to the solar spectrum is correctly specified and
 the band-edges values are updated for the desired material system.
-The script outputs:
+The code outputs:
 Total STH efficiency
 Individual contributions from each material in the heterostructure.
 # 3. Lattice-mismatch-code-for-MoS₂-PtSe₂.py
