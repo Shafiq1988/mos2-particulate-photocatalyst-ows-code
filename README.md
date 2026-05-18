@@ -24,9 +24,9 @@ Note: Users must input the lattice parameters of the two materials of interest. 
 The output includes:
 Best matching lattice configurations
 with corresponding mismatch percentages.
-# 4. MoS₂/WS₂_MD_cif-files
+# 4. MoS₂-WS₂_MD_cif-files
 This folder contains all the structure files (cif) of the initial and final states of MoS₂/WS₂ heterostructure at 300K and 400K temperatures.The sequence are accroding to the figures in the manuscript.
-# 5. MoS₂/PtSe₂_MD_cif-files 
+# 5. MoS₂-PtSe₂_MD_cif-files 
 This folder contains all the structure files (cif) of the initial and final states of MoS₂/PtSe₂ heterostructure at 300K and 400K temperatures.The sequence are accroding to the figures in the manuscript.
 # 6. Heterostructures_cif-files
 This folder contains the structure files (cif) of MoS₂/WS₂ and MoS₂/PtSe₂ heterostructures.
