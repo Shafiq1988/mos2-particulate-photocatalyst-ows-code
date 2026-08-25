@@ -6,9 +6,6 @@ MoS2-based particulate photocatalysts for overall water splitting:
 1. solar-to-hydrogen (STH) efficiency;
 2. lattice mismatch between two monolayers.
 
-No molecular-dynamics structures, bond-analysis data, or additional datasets
-are included.
-
 ## 1. STH-efficiency.py
 
 `STH-efficiency.py` estimates the ideal solar-to-hydrogen conversion efficiency
