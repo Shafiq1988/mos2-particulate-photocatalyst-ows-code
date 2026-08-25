@@ -1,193 +1,199 @@
-mport math
-from tabulate import tabulate
+"""Find low-mismatch square supercells for two hexagonal monolayers.
 
-# Lattice constants for MoS2 and PtSe2
-a1 = 3.1809599400  # MoS2 lattice constant in Å
-a2 = 3.7453484619855373  # PtSe2 lattice constant in Å
+The defaults reproduce the MoS2/PtSe2 search used in this repository. Lattice
+constants are in Angstrom. Mismatch is ``abs(L1 - L2) / L1 * 100``. The atom
+count assumes three atoms per primitive cell for both monolayers.
 
-mismatch_threshold = 0.03  # Maximum acceptable mismatch (3%)
-atom_limit = 400  # Maximum total atoms for practical supercells
+Run with: ``python lattice-mismatch-code-for-MoS2-PtSe2.py``
+"""
 
-# Print header
-print("Lattice Mismatch Analysis for MoS2/PtSe2 Heterostructure")
-print("=" * 60)
-print("n1: Supercell multiple for MoS2, n2: Supercell multiple for PtSe2")
-print("l1: Supercell length for MoS2, l2/l3: Supercell length for PtSe2")
-print("Mismatch: Relative lattice mismatch, Atoms: Total (3*n1^2 + 3*n2^2)")
-print("-" * 60)
+from __future__ import annotations
 
-# Collect results
-results = []
+import argparse
+import math
+from dataclasses import dataclass
 
-for n1 in range(1, 16):  # Extended range to find more options
 
-    # Ratio of supercell lengths
-    tmp = n1 * a1 / a2
+@dataclass(frozen=True)
+class Configuration:
+    """One commensurate-supercell candidate."""
 
-    # Supercell length for MoS2
-    l1 = n1 * a1
+    multiple_1: int
+    multiple_2: int
+    length_1: float
+    length_2: float
+    mismatch_percent: float
+    atoms_1: int
+    atoms_2: int
+    selection: str
 
-    # ---------------- Floor case ----------------
-    n2_floor = math.floor(tmp)
-    l2 = n2_floor * a2
+    @property
+    def total_atoms(self) -> int:
+        return self.atoms_1 + self.atoms_2
 
-    mismatch_floor = abs((l1 - l2) / l1)
 
-    atoms_mos2 = 3 * n1 * n1  # 3 atoms per unit cell
-    atoms_ptse2_floor = 3 * n2_floor * n2_floor
+def find_configurations(
+    lattice_1: float,
+    lattice_2: float,
+    *,
+    atoms_per_cell_1: int = 3,
+    atoms_per_cell_2: int = 3,
+    maximum_multiple: int = 15,
+    mismatch_limit_percent: float = 3.0,
+    atom_limit: int = 400,
+) -> list[Configuration]:
+    """Return valid supercell pairs sorted by increasing lattice mismatch."""
 
-    total_atoms_floor = atoms_mos2 + atoms_ptse2_floor
+    if min(lattice_1, lattice_2) <= 0:
+        raise ValueError("Lattice constants must be positive.")
+    if min(atoms_per_cell_1, atoms_per_cell_2, maximum_multiple, atom_limit) <= 0:
+        raise ValueError("Atom counts, limits, and multiples must be positive.")
+    if mismatch_limit_percent < 0:
+        raise ValueError("The mismatch limit cannot be negative.")
 
-    # Store valid floor configuration
-    if (
-        mismatch_floor < mismatch_threshold
-        and total_atoms_floor < atom_limit
-        and n2_floor > 0
-    ):
-        results.append([
-            n1,
-            n2_floor,
-            l1,
-            l2,
-            mismatch_floor * 100,  # convert to %
-            atoms_mos2,
-            atoms_ptse2_floor,
-            total_atoms_floor,
-            "Floor"
-        ])
+    configurations: list[Configuration] = []
+    seen_pairs: set[tuple[int, int]] = set()
 
-    # ---------------- Ceiling case ----------------
-    n2_ceiling = math.ceil(tmp)
-    l3 = n2_ceiling * a2
+    for multiple_1 in range(1, maximum_multiple + 1):
+        length_1 = multiple_1 * lattice_1
+        estimated_multiple_2 = length_1 / lattice_2
+        candidates = (
+            (math.floor(estimated_multiple_2), "floor"),
+            (math.ceil(estimated_multiple_2), "ceiling"),
+        )
 
-    mismatch_ceiling = abs((l1 - l3) / l1)
+        for multiple_2, selection in candidates:
+            pair = (multiple_1, multiple_2)
+            if multiple_2 <= 0 or pair in seen_pairs:
+                continue
+            seen_pairs.add(pair)
 
-    atoms_ptse2_ceiling = 3 * n2_ceiling * n2_ceiling
+            length_2 = multiple_2 * lattice_2
+            mismatch_percent = abs(length_1 - length_2) / length_1 * 100.0
+            atoms_1 = atoms_per_cell_1 * multiple_1**2
+            atoms_2 = atoms_per_cell_2 * multiple_2**2
+            total_atoms = atoms_1 + atoms_2
 
-    total_atoms_ceiling = atoms_mos2 + atoms_ptse2_ceiling
+            if mismatch_percent < mismatch_limit_percent and total_atoms < atom_limit:
+                configurations.append(
+                    Configuration(
+                        multiple_1=multiple_1,
+                        multiple_2=multiple_2,
+                        length_1=length_1,
+                        length_2=length_2,
+                        mismatch_percent=mismatch_percent,
+                        atoms_1=atoms_1,
+                        atoms_2=atoms_2,
+                        selection=selection,
+                    )
+                )
 
-    # Store valid ceiling configuration
-    if (
-        mismatch_ceiling < mismatch_threshold
-        and total_atoms_ceiling < atom_limit
-    ):
-        results.append([
-            n1,
-            n2_ceiling,
-            l1,
-            l3,
-            mismatch_ceiling * 100,  # convert to %
-            atoms_mos2,
-            atoms_ptse2_ceiling,
-            total_atoms_ceiling,
-            "Ceiling"
-        ])
+    return sorted(
+        configurations,
+        key=lambda item: (item.mismatch_percent, item.total_atoms),
+    )
 
-# Sort results by mismatch
-sorted_results = sorted(results, key=lambda x: x[4])
 
-# Display results in a table
-if len(sorted_results) > 0:
+def print_table(
+    configurations: list[Configuration],
+    *,
+    material_1: str,
+    material_2: str,
+) -> None:
+    """Print all configurations without requiring an external table package."""
 
-    print(f"Possible Configurations with mismatch < {mismatch_threshold*100}% "
-          f"and atoms < {atom_limit}:\n")
-
-    headers = [
-        "n1",
-        "n2",
-        "l1 (Å)",
-        "l2/l3 (Å)",
+    headers = (
+        f"{material_1} n",
+        f"{material_2} n",
+        "L1 (Angstrom)",
+        "L2 (Angstrom)",
         "Mismatch (%)",
-        "MoS2 Atoms",
-        "PtSe2 Atoms",
-        "Total Atoms",
-        "n2 Type"
+        f"{material_1} atoms",
+        f"{material_2} atoms",
+        "Total atoms",
+        "Choice",
+    )
+    rows = [
+        (
+            item.multiple_1,
+            item.multiple_2,
+            f"{item.length_1:.6f}",
+            f"{item.length_2:.6f}",
+            f"{item.mismatch_percent:.6f}",
+            item.atoms_1,
+            item.atoms_2,
+            item.total_atoms,
+            item.selection,
+        )
+        for item in configurations
     ]
+    widths = [
+        max(len(str(header)), *(len(str(row[index])) for row in rows))
+        for index, header in enumerate(headers)
+    ]
+    format_row = "  ".join(f"{{:<{width}}}" for width in widths).format
 
-    print(tabulate(sorted_results, headers=headers, floatfmt=".6f"))
+    print(format_row(*headers))
+    print(format_row(*("-" * width for width in widths)))
+    for row in rows:
+        print(format_row(*row))
 
-else:
-    print(f"No configurations found with mismatch < "
-          f"{mismatch_threshold*100}% and < {atom_limit} atoms.")
 
-# Highlight top 3 configurations
-print("=" * 60)
-print("Top 3 Configurations with Lowest Mismatch:")
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--material-1", default="MoS2")
+    parser.add_argument("--material-2", default="PtSe2")
+    parser.add_argument(
+        "--lattice-1", type=float, default=3.1809599400, help="Angstrom"
+    )
+    parser.add_argument(
+        "--lattice-2", type=float, default=3.7453484619855373, help="Angstrom"
+    )
+    parser.add_argument("--atoms-per-cell-1", type=int, default=3)
+    parser.add_argument("--atoms-per-cell-2", type=int, default=3)
+    parser.add_argument("--maximum-multiple", type=int, default=15)
+    parser.add_argument("--mismatch-limit", type=float, default=3.0, help="percent")
+    parser.add_argument("--atom-limit", type=int, default=400)
+    parser.add_argument("--top", type=int, default=3)
+    return parser.parse_args()
 
-if len(sorted_results) > 0:
 
-    for i, config in enumerate(sorted_results[:3], start=1):
+def main() -> None:
+    args = parse_arguments()
+    configurations = find_configurations(
+        args.lattice_1,
+        args.lattice_2,
+        atoms_per_cell_1=args.atoms_per_cell_1,
+        atoms_per_cell_2=args.atoms_per_cell_2,
+        maximum_multiple=args.maximum_multiple,
+        mismatch_limit_percent=args.mismatch_limit,
+        atom_limit=args.atom_limit,
+    )
 
-        print(f"Configuration {i}:")
-        print(f"MoS2 Supercell: {config[0]} × {config[0]}")
-        print(f"PtSe2 Supercell: {config[1]} × {config[1]}")
-        print(f"Supercell Length (MoS2): {config[2]:.6f} Å")
-        print(f"Supercell Length (PtSe2): {config[3]:.6f} Å")
-        print(f"Lattice Mismatch: {config[4]:.6f}%")
-        print(f"Atoms (MoS2): {config[5]} "
-              f"(1 Mo, 2 S per unit cell)")
-        print(f"Atoms (PtSe2): {config[6]} "
-              f"(1 Pt, 2 Se per unit cell)")
-        print(f"Total Atoms: {config[7]} ({config[8]})")
-        print("")
+    print(f"Lattice-mismatch analysis: {args.material_1}/{args.material_2}")
+    print(
+        f"Criteria: mismatch < {args.mismatch_limit:.3f}% and "
+        f"total atoms < {args.atom_limit}\n"
+    )
+    if not configurations:
+        print("No configurations satisfy the selected criteria.")
+        return
 
-else:
-    print(f"No configurations found with mismatch < "
-          f"{mismatch_threshold*100}% and < {atom_limit} atoms.")
-Lattice Mismatch Analysis for MoS2/PtSe2 Heterostructure
+    print_table(
+        configurations,
+        material_1=args.material_1,
+        material_2=args.material_2,
+    )
 
-============================================================
+    print(f"\nTop {min(args.top, len(configurations))} configuration(s):")
+    for rank, item in enumerate(configurations[: args.top], start=1):
+        print(
+            f"{rank}. {args.material_1} {item.multiple_1}x{item.multiple_1} / "
+            f"{args.material_2} {item.multiple_2}x{item.multiple_2}: "
+            f"{item.mismatch_percent:.6f}% mismatch, "
+            f"{item.total_atoms} atoms ({item.selection})"
+        )
 
-n1: Supercell multiple for MoS2, n2: Supercell multiple for PtSe2
 
-l1: Supercell length for MoS2, l2/l3: Supercell length for PtSe2
-
-Mismatch: Relative lattice mismatch, Atoms: Total (3*n1^2 + 3*n2^2)
-
-------------------------------------------------------------
-
-Possible Configurations with mismatch < 3.0% and atoms < 400:
-
-  n1    n2     l1 (Å)    l2/l3 (Å)    Mismatch (%)    MoS2 Atoms    PtSe2 Atoms    Total Atoms  n2 Type
-----  ----  ---------  -----------  --------------  ------------  -------------  -------------  ---------
-   7     6  22.266720    22.472091        0.922324           147            108            255  Ceiling
-   6     5  19.085760    18.726742        1.881074           108             75            183  Floor
-============================================================
-
-Top 3 Configurations with Lowest Mismatch:
-
-Configuration 1:
-
-MoS2 Supercell: 7 × 7
-
-PtSe2 Supercell: 6 × 6
-
-Supercell Length (MoS2): 22.266720 Å
-
-Supercell Length (PtSe2): 22.472091 Å
-
-Lattice Mismatch: 0.922324%
-
-Atoms (MoS2): 147 (1 Mo, 2 S per unit cell)
-
-Atoms (PtSe2): 108 (1 Pt, 2 Se per unit cell)
-
-Total Atoms: 255 (Ceiling)
-
-Configuration 2:
-
-MoS2 Supercell: 6 × 6
-
-PtSe2 Supercell: 5 × 5
-
-Supercell Length (MoS2): 19.085760 Å
-
-Supercell Length (PtSe2): 18.726742 Å
-
-Lattice Mismatch: 1.881074%
-
-Atoms (MoS2): 108 (1 Mo, 2 S per unit cell)
-
-Atoms (PtSe2): 75 (1 Pt, 2 Se per unit cell)
-
-Total Atoms: 183 (Floor)
+if __name__ == "__main__":
+    main()
